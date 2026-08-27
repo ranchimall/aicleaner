@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Text Cleaner</title>
+<style>
+  body {
+    font-family: monospace;
+    background: #111;
+    color: #eee;
+    padding: 20px;
+  }
+  textarea {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 15px;
+    background: #222;
+    color: #eee;
+    border: 1px solid #555;
+    padding: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    background: #0a84ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #0066cc;
+  }
+</style>
+</head>
+<body>
+
+<h2>AI Markup Cleaner</h2>
+
+<textarea id="input" placeholder="Paste your text here..."></textarea>
+
+<button onclick="cleanText()">Clean Text</button>
+
+<textarea id="output" placeholder="Cleaned text will appear here..."></textarea>
+
+<script>
+function cleanText() {
+  let text = document.getElementById("input").value;
+
+  // Normalize line endings
+  text = text.replace(/\r\n/g, "\n");
+
+  // Remove markdown headers (###, ##, #)
+  text = text.replace(/^#{1,6}\s*/gm, "");
+
+  // Remove bold/italic markers (** __ * _)
+  text = text.replace(/(\*\*|__)(.*?)\1/g, "$2");
+  text = text.replace(/(\*|_)(.*?)\1/g, "$2");
+
+  // Remove inline code `code`
+  text = text.replace(/`([^`]+)`/g, "$1");
+
+  // Remove horizontal rules --- or ***
+  text = text.replace(/^[-*]{3,}$/gm, "");
+
+  // Clean bullet points but preserve them
+  text = text.replace(/^[\t ]*[\*\-•]\s+/gm, "• ");
+
+  // Preserve numbered lists (normalize spacing)
+  text = text.replace(/^[\t ]*(\d+)\.\s+/gm, "$1. ");
+
+  // Remove blockquotes >
+  text = text.replace(/^\s*>\s?/gm, "");
+
+  // Remove excessive empty lines (keep max 2)
+  text = text.replace(/\n{3,}/g, "\n\n");
+
+  document.getElementById("output").value = text.trim();
+}
+</script>
+
+</body>
+</html>
