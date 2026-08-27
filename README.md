@@ -9,7 +9,7 @@ A lightweight, browser-based utility that strips Markdown formatting from AI-gen
 - 100% client-side — no dependencies, no server, no data leaves your browser
 
 ## Usage
-1. Open `AI_Markup_Remover.html` in any browser
+1. Open `https://ranchimall.github.io/aicleaner/` in any browser
 2. Paste your text into the input box
 3. Click **Clean Text**
 4. Copy the cleaned output
