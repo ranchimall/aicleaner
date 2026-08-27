@@ -2,122 +2,234 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>AI Text Cleaner</title>
 
 <style>
-  * {
-    box-sizing: border-box;
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
   }
 
   body {
-    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     color: #eee;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    flex-direction: column;
   }
 
-  .container {
-    width: 90%;
-    max-width: 800px;
+  header {
+    flex: 0 0 auto;
+    text-align: center;
+    padding: 16px 16px 10px;
+  }
+
+  header h2 {
+    margin: 0;
+    font-weight: 500;
+    font-size: 18px;
+  }
+
+  main {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 14px 14px;
+  }
+
+  .field {
+    flex: 1 1 0;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(12px);
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
   }
 
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 500;
+  .field-label {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px 0;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .field-label .count {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    text-transform: none;
+    letter-spacing: normal;
   }
 
   textarea {
+    flex: 1;
     width: 100%;
-    height: 180px;
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(0,0,0,0.4);
+    padding: 10px 14px 14px;
+    border: none;
+    background: transparent;
     color: #fff;
     font-size: 14px;
     outline: none;
-    transition: 0.3s;
-    resize: vertical;
+    resize: none;
   }
 
-  textarea:focus {
-    border-color: #0a84ff;
-    box-shadow: 0 0 10px rgba(10,132,255,0.5);
+  textarea::placeholder {
+    color: rgba(255,255,255,0.35);
   }
 
-  .btn-wrapper {
+  #output {
+    color: #cfeee0;
+  }
+
+  .btn-row {
+    flex: 0 0 auto;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    gap: 10px;
+    padding: 4px 0 2px;
   }
 
   button {
-    padding: 14px 40px;
-    font-size: 16px;
+    padding: 13px 30px;
+    font-size: 15px;
     border-radius: 999px;
     background: linear-gradient(135deg, #0a84ff, #5ac8fa);
     color: white;
     border: none;
     cursor: pointer;
-    transition: 0.3s;
     font-weight: 500;
-  }
-
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(10,132,255,0.4);
   }
 
   button:active {
     transform: scale(0.97);
   }
 
+  button.ghost {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 13px 20px;
+    font-weight: 400;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #0a84ff;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (min-width: 720px) {
+    main {
+      flex-direction: row;
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .btn-row {
+      flex-direction: column;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+  }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
+<header>
   <h2>AI Markup Cleaner</h2>
+</header>
 
-  <textarea id="input" placeholder="Paste your messy text here..."></textarea>
-
-  <div class="btn-wrapper">
-    <button onclick="cleanText()">Clean Text</button>
+<main>
+  <div class="field">
+    <div class="field-label">
+      <span>Input</span>
+      <span class="count" id="in-count">0 chars</span>
+    </div>
+    <textarea id="input" placeholder="Paste your messy text here..." oninput="onInput()"></textarea>
   </div>
 
-  <textarea id="output" placeholder="Cleaned text will appear here..."></textarea>
+  <div class="btn-row">
+    <button onclick="cleanText()">Clean Text</button>
+    <button class="ghost" onclick="copyOutput()">Copy result</button>
+  </div>
 
-</div>
+  <div class="field">
+    <div class="field-label">
+      <span>Output</span>
+      <span class="count" id="out-count">0 chars</span>
+    </div>
+    <textarea id="output" placeholder="Cleaned text will appear here..." readonly></textarea>
+  </div>
+</main>
+
+<div class="toast" id="toast">Copied</div>
 
 <script>
+function onInput() {
+  const text = document.getElementById('input').value;
+  document.getElementById('in-count').textContent = text.length + ' chars';
+}
+
 function cleanText() {
-  let text = document.getElementById("input").value;
+  let text = document.getElementById('input').value;
 
-  text = text.replace(/\r\n/g, "\n");
-  text = text.replace(/^#{1,6}\s*/gm, "");
-  text = text.replace(/(\*\*|__)(.*?)\1/g, "$2");
-  text = text.replace(/(\*|_)(.*?)\1/g, "$2");
-  text = text.replace(/`([^`]+)`/g, "$1");
-  text = text.replace(/^[-*]{3,}$/gm, "");
-  text = text.replace(/^[\t ]*[\*\-•]\s+/gm, "• ");
-  text = text.replace(/^[\t ]*(\d+)\.\s+/gm, "$1. ");
-  text = text.replace(/^\s*>\s?/gm, "");
-  text = text.replace(/\n{3,}/g, "\n\n");
+  text = text.replace(/\r\n/g, '\n');
+  text = text.replace(/^#{1,6}\s*/gm, '');
+  text = text.replace(/(\*\*|__)(.*?)\1/g, '$2');
+  text = text.replace(/(\*|_)(.*?)\1/g, '$2');
+  text = text.replace(/`([^`]+)`/g, '$1');
+  text = text.replace(/^[-*]{3,}$/gm, '');
+  text = text.replace(/^[\t ]*[\*\-•]\s+/gm, '• ');
+  text = text.replace(/^[\t ]*(\d+)\.\s+/gm, '$1. ');
+  text = text.replace(/^\s*>\s?/gm, '');
+  text = text.replace(/\n{3,}/g, '\n\n');
+  text = text.trim();
 
-  document.getElementById("output").value = text.trim();
+  document.getElementById('output').value = text;
+  document.getElementById('out-count').textContent = text.length + ' chars';
+}
+
+function copyOutput() {
+  const out = document.getElementById('output');
+  out.select();
+  out.setSelectionRange(0, 99999);
+  try {
+    document.execCommand('copy');
+  } catch (e) {}
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(out.value).catch(() => {});
+  }
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1200);
 }
 </script>
 
