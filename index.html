@@ -177,8 +177,7 @@
   </div>
 
   <div class="btn-row">
-    <button onclick="cleanText()">Cleanup AI Text</button>
-    <button onclick="cleanWhatsApp()">Clean WhatsApp Text</button>
+    <button onclick="cleanSmart()">Cleanup Text</button>
     <button class="ghost" onclick="copyOutput()">Copy result</button>
     <button class="ghost" onclick="startAgain()">Start again</button>
   </div>
@@ -218,11 +217,12 @@ function cleanText() {
   document.getElementById('output').value = text;
   document.getElementById('out-count').textContent = text.length + ' chars';
 }
+
 function cleanWhatsAppTextAdvanced(input) {
   return input
     .split("\n")
     .map(line => {
-      const match = line.match(/^\[.?\]\s[^:]+:\s*(.*)$/);
+      const match = line.match(/^\[.+?\]\s[^:]+:\s*(.*)$/);
       return match ? match[1] : line;
     })
     .filter(line => line.trim())
@@ -236,7 +236,17 @@ function cleanWhatsApp() {
   document.getElementById('output').value = result;
   document.getElementById('out-count').textContent = result.length + ' chars';
 }
- 
+
+function cleanSmart() {
+  const raw = document.getElementById('input').value;
+  const looksLikeWhatsApp = /^\[.+?\]\s.+:\s/m.test(raw);
+
+  if (looksLikeWhatsApp) {
+    cleanWhatsApp();
+  } else {
+    cleanText();
+  }
+}
 
 function copyOutput() {
   const out = document.getElementById('output');
@@ -259,7 +269,6 @@ function startAgain() {
   document.getElementById('in-count').textContent = '0 chars';
   document.getElementById('out-count').textContent = '0 chars';
 }
- 
 </script>
 
 </body>
