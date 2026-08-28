@@ -181,6 +181,12 @@
     <button class="ghost" onclick="copyOutput()">Copy result</button>
   </div>
 
+  <div class="btn-row">
+    <button onclick="cleanText()">Cleanup AI Text</button>
+    <button onclick="cleanWhatsApp()">Clean WhatsApp Text</button>
+    <button class="ghost" onclick="copyOutput()">Copy result</button>
+  </div>
+
   <div class="field">
     <div class="field-label">
       <span>Output</span>
@@ -216,6 +222,25 @@ function cleanText() {
   document.getElementById('output').value = text;
   document.getElementById('out-count').textContent = text.length + ' chars';
 }
+function cleanWhatsAppTextAdvanced(input) {
+  return input
+    .split("\n")
+    .map(line => {
+      const match = line.match(/^\[.?\]\s[^:]+:\s*(.*)$/);
+      return match ? match[1] : line;
+    })
+    .filter(line => line.trim())
+    .join("\n");
+}
+
+function cleanWhatsApp() {
+  const text = document.getElementById('input').value;
+  const result = cleanWhatsAppTextAdvanced(text);
+
+  document.getElementById('output').value = result;
+  document.getElementById('out-count').textContent = result.length + ' chars';
+}
+ 
 
 function copyOutput() {
   const out = document.getElementById('output');
