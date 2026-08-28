@@ -180,6 +180,7 @@
     <button onclick="cleanText()">Cleanup AI Text</button>
     <button onclick="cleanWhatsApp()">Clean WhatsApp Text</button>
     <button class="ghost" onclick="copyOutput()">Copy result</button>
+    <button class="ghost" onclick="startAgain()">Start again</button>
   </div>
 
   <div class="field">
@@ -251,6 +252,14 @@ function copyOutput() {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 1200);
 }
+
+function startAgain() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').value = '';
+  document.getElementById('in-count').textContent = '0 chars';
+  document.getElementById('out-count').textContent = '0 chars';
+}
+ 
 </script>
 
 </body>
